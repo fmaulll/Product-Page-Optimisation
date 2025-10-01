@@ -43,7 +43,7 @@ export default function ProductList({
           Sort
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as any)}
+            onChange={(e) => setSort(e.target.value as "asc" | "desc")}
             className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
           >
             <option value="asc">Price: Low → High</option>

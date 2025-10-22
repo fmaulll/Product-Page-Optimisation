@@ -1,98 +1,92 @@
-"use client";
-
+import InfiniteProducts from "./InfiniteProducts";
 import { Product } from "@/types/products";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
 
 export default function ProductList({
   products,
+  total,
   categories,
+  query,
 }: {
   products: Product[];
+  total: number;
   categories: string[];
+  query: {
+    q?: string | null;
+    category?: string | null;
+    sort?: string | null;
+    limit?: number;
+  };
 }) {
-  const [category, setCategory] = useState<string>("all");
-  const [sort, setSort] = useState<"asc" | "desc">("asc");
-
-  const filtered = [...products]
-    .filter((p) => (category === "all" ? true : p.category === category))
-    .sort((a, b) => (sort === "asc" ? a.price - b.price : b.price - a.price));
+  const { q, category, sort, limit = 20 } = query || {};
 
   return (
     <div className="space-y-8">
-      {/* Filter Bar */}
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white shadow-md p-4">
+      <form
+        method="get"
+        className="sticky top-0 z-10 flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white shadow-md p-4"
+      >
+        <input
+          name="q"
+          defaultValue={q ?? ""}
+          placeholder="Search products..."
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
+        />
+
         <label className="flex items-center gap-2 text-sm font-medium">
           Category
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
+            name="category"
+            defaultValue={category ?? ""}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
           >
-            <option value="all">All</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c.charAt(0).toUpperCase() + c.slice(1)}
-              </option>
-            ))}
+            <option value="">All</option>
+            {categories.map((c: any) => {
+              // handle both string and object shapes
+              const value = typeof c === "string" ? c : c.slug ?? c.name ?? "";
+              const label =
+                typeof c === "string" ? c : c.name ?? c.slug ?? "Unknown";
+              return (
+                <option key={value} value={value}>
+                  {label.charAt(0).toUpperCase() + label.slice(1)}
+                </option>
+              );
+            })}
           </select>
         </label>
 
         <label className="flex items-center gap-2 text-sm font-medium">
           Sort
           <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as "asc" | "desc")}
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
+            name="sort"
+            defaultValue={sort ?? ""}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
           >
+            <option value="">Default</option>
             <option value="asc">Price: Low → High</option>
             <option value="desc">Price: High → Low</option>
           </select>
         </label>
-      </div>
 
-      {/* Products Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {filtered.map((p) => (
-          <Link key={p.id} href={`/product/${p.id}`} className="group">
-            <div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ">
-              {/* Image */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-xl">
-                <Image
-                  src={p.thumbnail}
-                  alt={p.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                />
-              </div>
+        <input type="hidden" name="limit" value={String(limit)} />
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col justify-between p-4">
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold line-clamp-1">
-                    {p.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    {p.description}
-                  </p>
-                </div>
+        <button
+          type="submit"
+          className="ml-auto rounded-md bg-[#65c1ff] px-3 py-2 text-sm text-white cursor-pointer"
+        >
+          Apply
+        </button>
+      </form>
 
-                {/* Price + Stock */}
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-lg font-bold text-black">
-                    ${p.price}
-                  </span>
-                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
-                    In Stock
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <InfiniteProducts
+        initialProducts={products}
+        total={total}
+        initialLimit={limit}
+        initialQuery={{
+          q: q ?? undefined,
+          category: category ?? undefined,
+          sort: sort ?? undefined,
+        }}
+      />
     </div>
   );
 }

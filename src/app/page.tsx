@@ -1,5 +1,5 @@
 import ProductList from "@/components/ProductList";
-import { Product } from "@/types/products";
+import { Category, Product } from "@/types/products";
 
 const DEFAULT_LIMIT = 20;
 
@@ -38,7 +38,7 @@ async function fetchInitialProducts(params: {
 async function fetchCategories() {
   const res = await fetch("https://dummyjson.com/products/categories", { next: { revalidate: 3600 } });
   if (!res.ok) return [];
-  return (await res.json()) as string[];
+  return (await res.json()) as Category[];
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {

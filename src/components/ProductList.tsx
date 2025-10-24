@@ -1,5 +1,5 @@
 import InfiniteProducts from "./InfiniteProducts";
-import { Product } from "@/types/products";
+import { Category, Product } from "@/types/products";
 
 export default function ProductList({
   products,
@@ -9,7 +9,7 @@ export default function ProductList({
 }: {
   products: Product[];
   total: number;
-  categories: string[];
+  categories: Category[];
   query: {
     q?: string | null;
     category?: string | null;
@@ -40,7 +40,7 @@ export default function ProductList({
             className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
           >
             <option value="">All</option>
-            {categories.map((c: any) => {
+            {categories.map((c: Category) => {
               // handle both string and object shapes
               const value = typeof c === "string" ? c : c.slug ?? c.name ?? "";
               const label =

@@ -72,7 +72,7 @@ export default function InfiniteProducts({
       const res = await fetch(url);
       const data = await res.json();
 
-      let newProducts: Product[] = data.products ?? [];
+      const newProducts: Product[] = data.products ?? [];
       if (initialQuery.sort === "asc")
         newProducts.sort((a, b) => a.price - b.price);
       if (initialQuery.sort === "desc")

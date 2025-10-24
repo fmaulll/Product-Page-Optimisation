@@ -25,7 +25,7 @@ async function fetchInitialProducts(params: {
   const res = await fetch(url, { next: { revalidate: 60 } });
   const data = await res.json();
 
-  let products: Product[] = data.products ?? [];
+  const products: Product[] = data.products ?? [];
   const total = data.total ?? products.length;
 
   // server-side sort
